@@ -1,6 +1,6 @@
 {
   "name": "pothos-plugin-valibot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Pothos plugin for adding argument validation",
   "packageManager": "pnpm@9.12.2",
   "engines": {
