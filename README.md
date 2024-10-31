@@ -1,5 +1,11 @@
 # Valibot Validation Plugin
 
+<div align="center">
+
+[![@foadonis/magnify](https://img.shields.io/npm/v/pothos-plugin-valibot?style=for-the-badge)](https://www.npmjs.com/package/pothos-plugin-valibot) [![License](https://img.shields.io/github/license/deathman92/pothos-plugin-valibot?label=License&style=for-the-badge)](LICENCE) ![](https://img.shields.io/badge/Typescript-294E80.svg?style=for-the-badge&logo=typescript)
+
+</div>
+
 A plugin for adding validation for field arguments based on
 [Valibot](https://valibot.dev/). This plugin does not expose valibot directly, but most of the
 options map closely to the validations available in valibot.
