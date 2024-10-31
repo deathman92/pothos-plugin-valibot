@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": false,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "lib": ["esnext", "dom"],
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "noEmitOnError": false,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "pretty": true,
+    "removeComments": false,
+    "resolveJsonModule": false,
+    "skipLibCheck": false,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2019",
+    "composite": true,
+    "typeRoots": ["node_modules"],
+    "types": []
+  }
+}

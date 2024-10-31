@@ -1,0 +1,121 @@
+{
+  "name": "pothos-plugin-valibot",
+  "version": "0.1.0",
+  "description": "A Pothos plugin for adding argument validation",
+  "packageManager": "pnpm@9.12.2",
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "main": "./lib/index.js",
+  "types": "./dts/index.d.ts",
+  "module": "./esm/index.js",
+  "exports": {
+    "import": {
+      "default": "./esm/index.js"
+    },
+    "require": {
+      "types": "./dts/index.d.ts",
+      "default": "./lib/index.js"
+    }
+  },
+  "scripts": {
+    "type": "tsc --project tsconfig.type.json",
+    "build": "pnpm build:clean && pnpm build:cjs && pnpm build:dts && pnpm build:esm",
+    "build:clean": "git clean -dfX esm lib",
+    "build:cjs": "swc src -d lib --config-file .swcrc -C module.type=commonjs --strip-leading-paths",
+    "build:esm": "shx cp -r dts/* esm/ && swc src -d esm --config-file .swcrc -C module.type=es6 --strip-leading-paths && pnpm esm:extensions",
+    "build:dts": "tsc",
+    "esm:extensions": "cross-env TS_NODE_PROJECT=tsconfig.node.json node -r @swc-node/register ./scripts/esm-transformer.ts",
+    "test": "pnpm vitest --run",
+    "prepare": "husky",
+    "release": "release-it"
+  },
+  "keywords": [
+    "pothos",
+    "graphql",
+    "schema",
+    "typescript",
+    "valibot",
+    "validation",
+    "validate"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/deathman92/pothos-plugin-valibot#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deathman92/pothos-plugin-valibot.git"
+  },
+  "bugs": "https://github.com/deathman92/pothos-plugin-valibot/issues",
+  "author": "Deathman92 <deathman2292@gmail.com>",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "peerDependencies": {
+    "@pothos/core": "*",
+    "graphql": ">=16.6.0",
+    "valibot": "*"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "@pothos/core": "^4.3.0",
+    "@pothos/test-utils": "^2.1.0",
+    "@release-it/conventional-changelog": "^9.0.2",
+    "@swc-node/register": "^1.10.9",
+    "@swc/cli": "^0.5.0",
+    "@types/node": "^22.8.6",
+    "cross-env": "^7.0.3",
+    "graphql": "^16.8.1",
+    "graphql-tag": "^2.12.6",
+    "husky": "^9.1.6",
+    "release-it": "^17.10.0",
+    "shx": "^0.3.4",
+    "typescript": "^5.6.3",
+    "valibot": "^0.42.1",
+    "vitest": "^2.1.4"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "release-it": {
+    "git": {
+      "requireCleanWorkingDir": true,
+      "requireUpstream": true,
+      "commitMessage": "chore(release): ${version}",
+      "tagAnnotation": "v${version}",
+      "push": true,
+      "tagName": "v${version}"
+    },
+    "github": {
+      "release": true
+    },
+    "npm": {
+      "publish": true,
+      "skipChecks": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": {
+          "name": "angular"
+        }
+      }
+    }
+  },
+  "overrides": {
+    "graphql": "^16.8.1",
+    "@whatwg-node/fetch": "0.8.8"
+  },
+  "resolutions": {
+    "graphql": "^16.8.1",
+    "@whatwg-node/fetch": "0.8.8"
+  },
+  "pnpm": {
+    "overrides": {
+      "graphql": "^16.8.1",
+      "@whatwg-node/fetch": "0.8.8"
+    }
+  }
+}

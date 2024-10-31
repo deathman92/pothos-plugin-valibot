@@ -1,0 +1,42 @@
+.DS_Store
+*.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Cache
+.axe/
+.bundle/
+.happo/
+.idea/
+.npm/
+.vagrant/
+/.vscode/
+.yarnclean
+.husky
+
+# Directories
+coverage/
+dist/
+lib/
+dts/
+node_modules/
+tmp/
+.docz/
+.pnpm-store
+.turbo
+.env
+.source
+
+# Custom
+*.min.js
+*.map
+
+# Generated configs
+.devcontainer
+
+*.tsbuildinfo
+
+# Local Netlify folder
+.netlify
