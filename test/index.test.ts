@@ -53,7 +53,7 @@ describe("validation", () => {
           contactInfo: {
             name: "deathman"
             email: "Deathman@example.com"
-            phone: " 555-123-4567 "
+            phone: " 555-123-456 "
             aliases: ["deathman92"]
           }
           enum1: [Two, One]
@@ -73,7 +73,7 @@ describe("validation", () => {
           "exampleField": null,
         },
         "errors": [
-          [GraphQLError: enum1: Invalid input: Received Array, recursive.float: Invalid input: Received 1, recursive.recurse.number: Invalid value: Expected <=5 but received 6, recursive.recurse.float: Invalid input: Received 1, recursive.recurse.recurse: number must not be 3, odd: number must be odd, contactInfo.name: Name should be capitalized, contactInfo.aliases: Aliases should be capitalized, contactInfo.email: no example.com email addresses, contactInfo.email: email should be lowercase, contactInfo.aliases: contactInfo should include at least 2 aliases],
+          [GraphQLError: enum1: Invalid input: Received Array, recursive.float: Invalid input: Received 1, recursive.recurse.number: Invalid value: Expected <=5 but received 6, recursive.recurse.float: Invalid input: Received 1, recursive.recurse.recurse: number must not be 3, odd: number must be odd, contactInfo.name: Name should be capitalized, contactInfo.aliases: Aliases should be capitalized, contactInfo.email: no example.com email addresses, contactInfo.phone: Invalid length: Expected 12 but received 11, contactInfo.phone: Invalid format: Expected /^\\d{3}-\\d{3}-\\d{4}$/u but received "555-123-456", contactInfo.email: email should be lowercase, contactInfo.aliases: contactInfo should include at least 2 aliases],
         ],
       }
     `);
