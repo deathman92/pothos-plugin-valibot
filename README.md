@@ -264,6 +264,16 @@ error message:
 - `maxValue`?: `Constraint<Date>`
 - `schema`?: `ValiSchema<Date>`
 
+#### File
+
+- `type`?: `'boolean'`
+- `refine`?: `RefineConstraint<File>`
+- `check`?: `CheckConstraints<File>`
+- `minSize`?: `Constraint<number>`
+- `maxSize`?: `Constraint<number>`
+- `mimeType`?: `Constraint<string[]>`
+- `schema`?: `ValiSchema<File>`
+
 #### String
 
 - `type`?: `'string'`;
