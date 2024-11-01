@@ -1,20 +1,26 @@
-import * as v from 'valibot'
-import builder from '../builder'
-import type { ValidationOptions } from '../../../src'
+import * as v from "valibot";
+import builder from "../builder";
+import type { ValidationOptions } from "../../../src";
+
+builder.scalarType("File", {
+  serialize: () => {
+    throw new Error("Uploads can only be used as input types");
+  },
+});
 
 interface RecursiveShape {
-  number: number
-  recurse?: RecursiveShape
+  number: number;
+  recurse?: RecursiveShape;
 }
-const Recursive = builder.inputRef<RecursiveShape>('Recursive')
+const Recursive = builder.inputRef<RecursiveShape>("Recursive");
 
 const numberValidation: ValidationOptions<number> = {
   maxValue: 5,
-}
+};
 
 Recursive.implement({
   validate: {
-    check: [(fields) => fields.number !== 3, 'number must not be 3'],
+    check: [(fields) => fields.number !== 3, "number must not be 3"],
   },
   fields: (t) => ({
     number: t.int({
@@ -32,7 +38,7 @@ Recursive.implement({
       type: Recursive,
     }),
   }),
-})
+});
 
 enum Enum1 {
   One = 0,
@@ -41,10 +47,10 @@ enum Enum1 {
 }
 
 const Enum1Type = builder.enumType(Enum1, {
-  name: 'Enum1',
-})
+  name: "Enum1",
+});
 
-const ContactInfo = builder.inputType('ContactInfo', {
+const ContactInfo = builder.inputType("ContactInfo", {
   fields: (t) => ({
     name: t.string({
       required: true,
@@ -52,7 +58,7 @@ const ContactInfo = builder.inputType('ContactInfo', {
         maxLength: 30,
         check: [
           async (name) => Promise.resolve(name[0]?.toUpperCase() === name[0]),
-          'Name should be capitalized',
+          "Name should be capitalized",
         ],
       },
     }),
@@ -63,7 +69,7 @@ const ContactInfo = builder.inputType('ContactInfo', {
         },
         check: [
           (list) => list.every((alias) => alias[0]?.toUpperCase() === alias[0]),
-          'Aliases should be capitalized',
+          "Aliases should be capitalized",
         ],
       },
     }),
@@ -72,8 +78,8 @@ const ContactInfo = builder.inputType('ContactInfo', {
       validate: {
         email: true,
         check: [
-          (arg) => arg.split('@')[1] !== 'example.com',
-          'no example.com email addresses',
+          (arg) => arg.split("@")[1] !== "example.com",
+          "no example.com email addresses",
         ],
       },
     }),
@@ -84,8 +90,18 @@ const ContactInfo = builder.inputType('ContactInfo', {
         length: 12,
       },
     }),
+    avatar: t.field({
+      type: "File",
+      validate: {
+        maxSize: 1024 * 1024 * 2, // 2MB
+        mimeType: [
+          ["image/png", "image/jpg", "image/gif"],
+          "Avatar must be an image",
+        ],
+      },
+    }),
   }),
-})
+});
 
 builder.queryType({
   fields: (t) => ({
@@ -113,7 +129,7 @@ builder.queryType({
       args: {
         email: t.arg.string({
           validate: {
-            email: [true, 'invalid email address'],
+            email: [true, "invalid email address"],
           },
         }),
         phone: t.arg.string(),
@@ -121,7 +137,7 @@ builder.queryType({
       validate: {
         check: [
           (args) => !!args.phone || !!args.email,
-          'Must provide either phone number or email address',
+          "Must provide either phone number or email address",
         ],
       },
       resolve: () => true,
@@ -155,7 +171,7 @@ builder.queryType({
         odd: t.arg.int({
           validate: {
             maxValue: 5,
-            check: [(n) => n % 2 === 1, 'number must be odd'],
+            check: [(n) => n % 2 === 1, "number must be odd"],
           },
           required: true,
         }),
@@ -168,10 +184,10 @@ builder.queryType({
                 v.forward(
                   v.check(
                     (info) => info.email.toLocaleLowerCase() === info.email,
-                    'email should be lowercase',
+                    "email should be lowercase"
                   ),
-                  ['email'],
-                ),
+                  ["email"]
+                )
               ),
           },
         }),
@@ -183,19 +199,19 @@ builder.queryType({
             v.forward(
               v.check(
                 (args) => (args.contactInfo?.aliases?.length ?? 0) > 1,
-                'contactInfo should include at least 2 aliases',
+                "contactInfo should include at least 2 aliases"
               ),
-              ['contactInfo', 'aliases'],
-            ),
+              ["contactInfo", "aliases"]
+            )
           ),
       },
       resolve(_parent, args) {
-        return args.odd
+        return args.odd;
       },
     }),
     all: t.boolean({
       description:
-        'all possible validations, (these constraints cant be satisfied)',
+        "all possible validations, (these constraints cant be satisfied)",
       args: {
         number: t.arg.float({
           validate: {
@@ -207,13 +223,13 @@ builder.queryType({
         }),
         bigint: t.arg.id({
           validate: {
-            type: 'bigint',
+            type: "bigint",
             check: () => true,
           },
         }),
         string: t.arg.string({
           validate: {
-            type: 'string',
+            type: "string",
             email: true,
             url: true,
             uuid: true,
@@ -234,12 +250,12 @@ builder.queryType({
         }),
         array: t.arg.stringList({
           validate: {
-            type: 'array',
+            type: "array",
             length: 5,
             minLength: 5,
             maxLength: 5,
             items: {
-              type: 'string',
+              type: "string",
               maxLength: 5,
             },
             check: () => true,
@@ -263,22 +279,22 @@ builder.queryType({
       resolve: () => true,
     }),
   }),
-})
+});
 
-const WithValidationInput = builder.inputType('WithValidationInput', {
+const WithValidationInput = builder.inputType("WithValidationInput", {
   fields: (t) => ({
     name: t.string(),
     age: t.int(),
   }),
   validate: {
     check: [
-      [(args) => args.name === 'secret', 'Incorrect name given'],
-      [(args) => args.age === 100, 'Incorrect age given'],
+      [(args) => args.name === "secret", "Incorrect name given"],
+      [(args) => args.age === 100, "Incorrect age given"],
     ],
   },
-})
+});
 const WithValidationAndFieldValidator = builder.inputType(
-  'WithValidationAndFieldValidator',
+  "WithValidationAndFieldValidator",
   {
     fields: (t) => ({
       name: t.string({
@@ -290,18 +306,18 @@ const WithValidationAndFieldValidator = builder.inputType(
     }),
     validate: {
       check: [
-        [(args) => args.name === 'secret', 'Incorrect name given'],
-        [(args) => args.age === 100, 'Incorrect age given'],
+        [(args) => args.name === "secret", "Incorrect name given"],
+        [(args) => args.age === 100, "Incorrect age given"],
       ],
     },
-  },
-)
+  }
+);
 
-const NestedInput = builder.inputType('NestedInput', {
+const NestedInput = builder.inputType("NestedInput", {
   fields: (t) => ({ id: t.id() }),
-})
+});
 
-const SoloNestedInput = builder.inputType('SoloNestedInput', {
+const SoloNestedInput = builder.inputType("SoloNestedInput", {
   fields: (t) => ({
     nested: t.field({
       required: true,
@@ -311,9 +327,9 @@ const SoloNestedInput = builder.inputType('SoloNestedInput', {
       },
     }),
   }),
-})
+});
 
-const NestedObjectListInput = builder.inputType('NestedObjectListInput', {
+const NestedObjectListInput = builder.inputType("NestedObjectListInput", {
   fields: (t) => ({
     nested: t.field({
       required: true,
@@ -323,75 +339,75 @@ const NestedObjectListInput = builder.inputType('NestedObjectListInput', {
       },
     }),
   }),
-})
+});
 
-const WithSchemaInput = builder.inputType('WithSchemaInput', {
+const WithSchemaInput = builder.inputType("WithSchemaInput", {
   fields: (t) => ({
     name: t.string(),
   }),
   validate: {
     schema: v.object({ name: v.pipe(v.string(), v.minLength(2)) }),
   },
-})
+});
 
-builder.queryField('soloNested', (t) =>
+builder.queryField("soloNested", (t) =>
   t.boolean({
     nullable: true,
     args: {
       input: t.arg({ type: SoloNestedInput }),
     },
     resolve: () => true,
-  }),
-)
+  })
+);
 
-builder.queryField('nestedObjectList', (t) =>
+builder.queryField("nestedObjectList", (t) =>
   t.boolean({
     nullable: true,
     args: {
       input: t.arg({ type: NestedObjectListInput }),
     },
     resolve: () => true,
-  }),
-)
+  })
+);
 
-builder.queryField('withValidationInput', (t) =>
+builder.queryField("withValidationInput", (t) =>
   t.boolean({
     nullable: true,
     args: {
       input: t.arg({ type: WithValidationInput }),
     },
     resolve: () => true,
-  }),
-)
+  })
+);
 
-builder.queryField('withValidationAndFieldValidator', (t) =>
+builder.queryField("withValidationAndFieldValidator", (t) =>
   t.boolean({
     nullable: true,
     args: {
       input: t.arg({ type: WithValidationAndFieldValidator }),
     },
     resolve: () => true,
-  }),
-)
+  })
+);
 
-builder.queryField('withSchemaInput', (t) =>
+builder.queryField("withSchemaInput", (t) =>
   t.boolean({
     nullable: true,
     args: {
       input: t.arg({ type: WithSchemaInput }),
     },
     resolve: () => true,
-  }),
-)
+  })
+);
 
-builder.queryField('withSchemaInputList', (t) =>
+builder.queryField("withSchemaInputList", (t) =>
   t.boolean({
     nullable: true,
     args: {
       input: t.arg({ type: [WithSchemaInput] }),
     },
     resolve: () => true,
-  }),
-)
+  })
+);
 
-export default builder.toSchema()
+export default builder.toSchema();

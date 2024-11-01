@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { execute } from "graphql";
 import { gql } from "graphql-tag";
-import schema from "./example/schema";
+import executor from "./example/executor";
+import createMockFile from "./utils/createMockFile";
 
 describe("validation", () => {
   it("valid query", async () => {
     const query = gql`
-      query {
+      query Valid($file: File) {
         exampleField(
           odd: 1
           recursive: {
@@ -19,16 +19,18 @@ describe("validation", () => {
             email: "deathman@test.com"
             phone: " 555-123-4567 "
             aliases: ["Deathman92", "Deathman2292"]
+            avatar: $file
           }
           enum1: [One, Two]
         )
       }
     `;
 
-    const result = await execute({
-      schema,
+    const result = await executor({
       document: query,
-      contextValue: {},
+      variables: {
+        file: createMockFile({ name: "avatar.png", type: "image/png" }),
+      },
     });
 
     expect(result).toMatchInlineSnapshot(`
@@ -42,7 +44,7 @@ describe("validation", () => {
 
   it("invalid query", async () => {
     const query = gql`
-      query {
+      query Invalid($file: File) {
         exampleField(
           odd: 2
           recursive: {
@@ -55,16 +57,18 @@ describe("validation", () => {
             email: "Deathman@example.com"
             phone: " 555-123-456 "
             aliases: ["deathman92"]
+            avatar: $file
           }
           enum1: [Two, One]
         )
       }
     `;
 
-    const result = await execute({
-      schema,
+    const result = await executor({
       document: query,
-      contextValue: {},
+      variables: {
+        file: createMockFile({ name: "invalid.txt", size: 1024 * 1024 * 3 }),
+      },
     });
 
     expect(result).toMatchInlineSnapshot(`
@@ -73,7 +77,7 @@ describe("validation", () => {
           "exampleField": null,
         },
         "errors": [
-          [GraphQLError: enum1: Invalid input: Received Array, recursive.float: Invalid input: Received 1, recursive.recurse.number: Invalid value: Expected <=5 but received 6, recursive.recurse.float: Invalid input: Received 1, recursive.recurse.recurse: number must not be 3, odd: number must be odd, contactInfo.name: Name should be capitalized, contactInfo.aliases: Aliases should be capitalized, contactInfo.email: no example.com email addresses, contactInfo.phone: Invalid length: Expected 12 but received 11, contactInfo.phone: Invalid format: Expected /^\\d{3}-\\d{3}-\\d{4}$/u but received "555-123-456", contactInfo.email: email should be lowercase, contactInfo.aliases: contactInfo should include at least 2 aliases],
+          [GraphQLError: enum1: Invalid input: Received Array, recursive.float: Invalid input: Received 1, recursive.recurse.number: Invalid value: Expected <=5 but received 6, recursive.recurse.float: Invalid input: Received 1, recursive.recurse.recurse: number must not be 3, odd: number must be odd, contactInfo.name: Name should be capitalized, contactInfo.aliases: Aliases should be capitalized, contactInfo.email: no example.com email addresses, contactInfo.phone: Invalid length: Expected 12 but received 11, contactInfo.phone: Invalid format: Expected /^\\d{3}-\\d{3}-\\d{4}$/u but received "555-123-456", contactInfo.avatar: Invalid size: Expected <=2097152 but received 3145728, contactInfo.avatar: Avatar must be an image, contactInfo.email: email should be lowercase, contactInfo.aliases: contactInfo should include at least 2 aliases],
         ],
       }
     `);
@@ -94,10 +98,8 @@ describe("validation", () => {
       }
     `;
 
-    const result = await execute({
-      schema,
+    const result = await executor({
       document: query,
-      contextValue: {},
     });
 
     expect(result).toMatchInlineSnapshot(`
@@ -135,10 +137,8 @@ describe("validation", () => {
       }
     `;
 
-    const result = await execute({
-      schema,
+    const result = await executor({
       document: query,
-      contextValue: {},
     });
 
     expect(result).toMatchInlineSnapshot(`
@@ -177,10 +177,8 @@ describe("validation", () => {
       }
     `;
 
-    const result = await execute({
-      schema,
+    const result = await executor({
       document: query,
-      contextValue: {},
     });
 
     expect(result).toMatchInlineSnapshot(`
@@ -215,10 +213,8 @@ describe("validation", () => {
       }
     `;
 
-    const result = await execute({
-      schema,
+    const result = await executor({
       document: query,
-      contextValue: {},
     });
 
     expect(result).toMatchInlineSnapshot(`

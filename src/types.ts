@@ -70,6 +70,14 @@ export interface DateValidationOptions<T extends Date = Date>
   maxValue?: Constraint<Date>;
 }
 
+export interface FileValidationOptions<T extends File = File>
+  extends BaseValidationOptions<T> {
+  type?: "file";
+  minSize?: Constraint<number>;
+  maxSize?: Constraint<number>;
+  mimeType?: Constraint<readonly `${string}/${string}`[]>;
+}
+
 export interface StringValidationOptions<T extends string = string>
   extends BaseValidationOptions<T> {
   type?: "string";
@@ -109,6 +117,8 @@ export type ValidationOptions<T> = [T] extends [number]
   ? StringValidationOptions<T>
   : [T] extends [Date]
   ? DateValidationOptions<T>
+  : [T] extends [File]
+  ? FileValidationOptions<T>
   : [T] extends [unknown[]]
   ? ArrayValidationOptions<T>
   : [T] extends [object]
@@ -123,6 +133,7 @@ export type ValidationOptionUnion =
   | BigIntValidationOptions
   | BooleanValidationOptions
   | DateValidationOptions
+  | FileValidationOptions
   | NumberValidationOptions
   | ObjectValidationOptions
   | StringValidationOptions;

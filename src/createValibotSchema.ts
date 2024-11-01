@@ -3,6 +3,9 @@ import * as v from "valibot";
 import type {
   ArrayValidationOptions,
   BaseValidationOptions,
+  BigIntValidationOptions,
+  DateValidationOptions,
+  FileValidationOptions,
   NumberValidationOptions,
   StringValidationOptions,
   ValidationOptionUnion,
@@ -30,6 +33,14 @@ const dateValidations = [
   ...baseValidations,
   "maxValue",
   "minValue",
+  "type",
+] as const;
+
+const fileValidations = [
+  ...baseValidations,
+  "minSize",
+  "maxSize",
+  "mimeType",
   "type",
 ] as const;
 
@@ -171,7 +182,7 @@ export const createNumberValidator = validatorCreator(
 export const createBigintValidator = validatorCreator(
   "bigint",
   bigIntValidations,
-  (options) => {
+  (options: BigIntValidationOptions) => {
     let validator = v.bigint() as ValiSchema<bigint>;
 
     if (options.minValue) {
@@ -205,7 +216,7 @@ export const createBooleanValidator = validatorCreator(
 export const createDateValidator = validatorCreator(
   "date",
   dateValidations,
-  (options) => {
+  (options: DateValidationOptions) => {
     let validator = v.date() as ValiSchema<Date>;
 
     if (options.minValue) {
@@ -223,6 +234,43 @@ export const createDateValidator = validatorCreator(
         Array.isArray(options.maxValue)
           ? v.maxValue(new Date(options.maxValue[0]), options.maxValue[1])
           : v.maxValue(new Date(options.maxValue))
+      );
+    }
+
+    return refine(validator, options);
+  }
+);
+
+export const createFileValidator = validatorCreator(
+  "file",
+  fileValidations,
+  (options: FileValidationOptions) => {
+    let validator = v.file() as ValiSchema<File>;
+
+    if (options.minSize) {
+      validator = v.pipeAsync(
+        validator,
+        Array.isArray(options.minSize)
+          ? v.minSize(Number(options.minSize[0]), options.minSize[1])
+          : v.minSize(Number(options.minSize))
+      );
+    }
+
+    if (options.maxSize) {
+      validator = v.pipeAsync(
+        validator,
+        Array.isArray(options.maxSize)
+          ? v.maxSize(Number(options.maxSize[0]), options.maxSize[1])
+          : v.maxSize(Number(options.maxSize))
+      );
+    }
+
+    if (options.mimeType) {
+      validator = v.pipeAsync(
+        validator,
+        Array.isArray(options.mimeType[0])
+          ? v.mimeType(options.mimeType[0], options.mimeType[1])
+          : v.mimeType(options.mimeType as any)
       );
     }
 
@@ -248,7 +296,7 @@ export const createStringValidator = validatorCreator(
 
         validator = v.pipeAsync(
           validator,
-          // @ts-ignore
+          // @ts-expect-error
           v[constraint](Array.isArray(value) ? value[1] : undefined)
         );
       }
@@ -367,6 +415,7 @@ const validationCreators = [
   createBigintValidator,
   createBooleanValidator,
   createDateValidator,
+  createFileValidator,
   createStringValidator,
   createObjectValidator,
 ];

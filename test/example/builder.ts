@@ -1,17 +1,21 @@
-import '../../src'
-import SchemaBuilder from '@pothos/core'
-import * as v from 'valibot'
+import "../../src";
+import { createGraphQLError } from "graphql-yoga";
+import SchemaBuilder from "@pothos/core";
+import * as v from "valibot";
 
 export default new SchemaBuilder<{
   Scalars: {
-    ID: { Input: bigint | number | string; Output: bigint | number | string }
-  }
+    ID: { Input: bigint | number | string; Output: bigint | number | string };
+    File: { Input: File; Output: never };
+  };
 }>({
-  plugins: ['valibot'],
+  plugins: ["valibot"],
   valibot: {
     validationError: (error) =>
-      error.issues
-        .map((issue) => `${v.getDotPath(issue)}: ${issue.message}`)
-        .join(', '),
+      createGraphQLError(
+        error.issues
+          .map((issue) => `${v.getDotPath(issue)}: ${issue.message}`)
+          .join(", ")
+      ),
   },
-})
+});
