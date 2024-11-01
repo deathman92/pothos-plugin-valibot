@@ -20,6 +20,7 @@ describe("validation", () => {
             phone: " 555-123-4567 "
             aliases: ["Deathman92", "Deathman2292"]
             avatar: $file
+            bio: "Qwerty1234"
           }
           enum1: [One, Two]
         )
@@ -42,7 +43,7 @@ describe("validation", () => {
     `);
   });
 
-  it("invalid query", async () => {
+  it.only("invalid query", async () => {
     const query = gql`
       query Invalid($file: File) {
         exampleField(
@@ -58,6 +59,7 @@ describe("validation", () => {
             phone: " 555-123-456 "
             aliases: ["deathman92"]
             avatar: $file
+            bio: "Qwerty1234!!"
           }
           enum1: [Two, One]
         )

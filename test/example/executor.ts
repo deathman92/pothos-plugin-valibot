@@ -5,12 +5,7 @@ import schema from "./schema";
 
 globalThis.File = File;
 
-const yoga = createYoga({
-  schema,
-  fetchAPI: {
-    fetch: globalThis.fetch,
-  },
-});
+const yoga = createYoga({ schema });
 
 const executor = buildHTTPExecutor({
   fetch: yoga.fetch,

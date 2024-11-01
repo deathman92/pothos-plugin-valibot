@@ -92,9 +92,16 @@ export interface StringValidationOptions<T extends string = string>
   regex?: Constraint<RegExp>;
 }
 
+type ObjectFields<T extends object> = {
+  [Name in keyof T]-?: T[Name] extends Function ? never : Name;
+}[keyof T];
+
 export interface ObjectValidationOptions<T extends object = object>
   extends BaseValidationOptions<T> {
   type?: "object";
+  fields?: {
+    [Name in ObjectFields<T>]?: ValidationOptions<NonNullable<T[Name]>>;
+  };
 }
 
 export interface ArrayValidationOptions<T extends unknown[] = unknown[]>

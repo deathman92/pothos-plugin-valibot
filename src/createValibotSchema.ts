@@ -7,6 +7,7 @@ import type {
   DateValidationOptions,
   FileValidationOptions,
   NumberValidationOptions,
+  ObjectValidationOptions,
   StringValidationOptions,
   ValidationOptionUnion,
   ValiSchema,
@@ -67,7 +68,7 @@ const arrayValidations = [
   "type",
 ] as const;
 
-const objectValidations = [...baseValidations, "type"] as const;
+const objectValidations = [...baseValidations, "fields", "type"] as const;
 
 function validatorCreator<T extends BaseValidationOptions<any>>(
   type: NonNullable<T["type"]>,
@@ -404,11 +405,89 @@ export function createArrayValidator(
   return refine(validator, options);
 }
 
-export const createObjectValidator = validatorCreator(
-  "object",
-  objectValidations,
-  (options) => refine(v.looseObject({}), options)
-);
+export function isObjectValidator(
+  options: ValidationOptionUnion
+): options is ObjectValidationOptions {
+  if (
+    typeof options !== "object" ||
+    (options.type && options.type !== "object")
+  ) {
+    return false;
+  }
+
+  const validations = Object.keys(options);
+
+  return validations.every((validation) =>
+    objectValidations.includes(validation as keyof ObjectValidationOptions)
+  );
+}
+
+// export const createObjectValidator = validatorCreator(
+//   "object",
+//   objectValidations,
+//   (options: ObjectValidationOptions) => {
+//     if (!options.fields) {
+//       return refine(v.looseObject({}), options);
+//     }
+
+//     const entries = Object.entries(options.fields).reduce(
+//       (prev, [name, opts]) => ({
+//         ...prev,
+//         [name]: createValibotSchema(opts as ValidationOptionUnion),
+//       }),
+//       {}
+//     );
+
+//     return refine(v.looseObject(entries), options);
+//   }
+// );
+
+export function createObjectValidator(
+  options: ObjectValidationOptions<object>,
+  fields: v.ObjectEntriesAsync
+) {
+  return refine(v.looseObjectAsync(fields), options);
+}
+
+export function createEntriesValidators(
+  options: ObjectValidationOptions | undefined
+) {
+  if (options?.fields) {
+    return Object.entries(options.fields).reduce(
+      (prev, [name, opts]) => ({
+        ...prev,
+        [name]: createValibotSchema(opts as BaseValidationOptions<unknown>),
+      }),
+      {}
+    );
+  }
+  return {};
+}
+
+export function mergeEntriesValidators(
+  entries1: v.ObjectEntriesAsync,
+  entries2: v.ObjectEntriesAsync
+) {
+  if (Object.keys(entries1).length === 0)
+    return mergeEntriesValidators(entries2, {});
+  if (Object.keys(entries2).length === 0) return {};
+
+  const entries: v.ObjectEntriesAsync = {};
+  for (let name in entries1) {
+    if (entries2[name]) {
+      entries[name] = v.intersectAsync([entries1[name], entries2[name]]);
+    } else {
+      entries[name] = entries1[name];
+    }
+  }
+  for (let name in entries2) {
+    if (!entries1[name]) {
+      entries[name] = entries2[name];
+    }
+  }
+
+  return entries;
+}
 
 const validationCreators = [
   createNumberValidator,
@@ -417,7 +496,7 @@ const validationCreators = [
   createDateValidator,
   createFileValidator,
   createStringValidator,
-  createObjectValidator,
+  // createObjectValidator,
 ];
 
 export function isBaseValidator(options: ValidationOptionUnion) {
@@ -460,6 +539,11 @@ export default function createValibotSchema(
       ? createValibotSchema(options.items)
       : v.unknown();
     typeValidators.push(createArrayValidator(options, items));
+  }
+
+  if (isObjectValidator(options)) {
+    const fields = createEntriesValidators(options);
+    typeValidators.push(createObjectValidator(options, fields));
   }
 
   if (typeValidators.length === 0) {

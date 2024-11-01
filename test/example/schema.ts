@@ -1,6 +1,6 @@
 import * as v from "valibot";
-import builder from "../builder";
-import type { ValidationOptions } from "../../../src";
+import builder from "./builder";
+import type { ValidationOptions } from "../../src";
 
 builder.scalarType("File", {
   serialize: () => {
@@ -100,6 +100,11 @@ const ContactInfo = builder.inputType("ContactInfo", {
         ],
       },
     }),
+    bio: t.string({
+      validate: {
+        maxLength: 10,
+      },
+    }),
   }),
 });
 
@@ -178,6 +183,11 @@ builder.queryType({
         contactInfo: t.arg({
           type: ContactInfo,
           validate: {
+            fields: {
+              bio: {
+                regex: /^[a-zA-Z0-9]*$/,
+              },
+            },
             refine: (schema) =>
               v.pipeAsync(
                 schema,
